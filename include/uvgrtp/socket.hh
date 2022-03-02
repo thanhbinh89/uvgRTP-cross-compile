@@ -15,6 +15,9 @@
 #include <vector>
 #include <string>
 
+typedef ssize_t (*redirect_sendto_t)(const void *, size_t, int);
+typedef int (*redirect_sendmmsg_t)(struct mmsghdr *, unsigned int, int);
+extern void set_redirect_socket(redirect_sendto_t, redirect_sendmmsg_t);
 
 namespace uvgrtp {
 
