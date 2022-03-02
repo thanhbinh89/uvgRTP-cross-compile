@@ -25,13 +25,6 @@ using namespace mingw;
 
 #define WSABUF_SIZE 256
 
-static redirect_sendto_t redirect_sendto = NULL;
-static redirect_sendmmsg_t redirect_sendmmsg = NULL;
-void set_redirect_socket(redirect_sendto_t r1, redirect_sendmmsg_t r2) {
-    redirect_sendto = r1;
-    redirect_sendmmsg = r2;
-}
-
 uvgrtp::socket::socket(int flags):
     socket_(-1),
     flags_(flags)
@@ -162,8 +155,8 @@ rtp_error_t uvgrtp::socket::__sendto(sockaddr_in& addr, uint8_t *buf, size_t buf
     int nsend = 0;
 
 #ifndef _WIN32
-    if (NULL != redirect_sendto) {
-        nsend = redirect_sendto(buf, buf_len, flags);
+    if (nullptr != redirect_sendto) {
+        nsend = redirect_sendto(socket_, buf, buf_len, flags);
     }
     else if ((nsend = ::sendto(socket_, buf, buf_len, flags, (const struct sockaddr *)&addr, sizeof(addr_))) == -1) {
         LOG_ERROR("Failed to send data: %s", strerror(errno));
@@ -242,8 +235,8 @@ rtp_error_t uvgrtp::socket::__sendtov(
     header_.msg_hdr.msg_control    = 0;
     header_.msg_hdr.msg_controllen = 0;
 
-    if (NULL != redirect_sendmmsg) {
-        redirect_sendmmsg(&header_, 1, flags);
+    if (nullptr != redirect_sendmmsg) {
+        redirect_sendmmsg(socket_, &header_, 1, flags);
     }
     else if (sendmmsg(socket_, &header_, 1, flags) < 0) {
         LOG_ERROR("Failed to send RTP frame: %s!", strerror(errno));
@@ -376,8 +369,8 @@ rtp_error_t uvgrtp::socket::__sendtov(
     ssize_t bptr  = buffers.size();
 
     while (bptr > npkts) {
-        if (NULL != redirect_sendmmsg) {
-            redirect_sendmmsg(hptr, npkts, flags);
+        if (nullptr != redirect_sendmmsg) {
+            redirect_sendmmsg(socket_, hptr, npkts, flags);
         }
         else if (sendmmsg(socket_, hptr, npkts, flags) < 0) {
             log_platform_error("sendmmsg(2) failed");
@@ -388,8 +381,8 @@ rtp_error_t uvgrtp::socket::__sendtov(
         hptr += npkts;
     }
 
-    if (NULL != redirect_sendmmsg) {
-        redirect_sendmmsg(hptr, bptr, flags);
+    if (nullptr != redirect_sendmmsg) {
+        redirect_sendmmsg(socket_, hptr, bptr, flags);
     }
     else if (sendmmsg(socket_, hptr, bptr, flags) < 0) {
         log_platform_error("sendmmsg(2) failed");

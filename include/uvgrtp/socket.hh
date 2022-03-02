@@ -15,10 +15,6 @@
 #include <vector>
 #include <string>
 
-typedef ssize_t (*redirect_sendto_t)(const void *, size_t, int);
-typedef int (*redirect_sendmmsg_t)(struct mmsghdr *, unsigned int, int);
-extern void set_redirect_socket(redirect_sendto_t, redirect_sendmmsg_t);
-
 namespace uvgrtp {
 
 #ifdef _WIN32
@@ -34,6 +30,10 @@ namespace uvgrtp {
     typedef std::vector<std::vector<std::pair<size_t, uint8_t *>>> pkt_vec;
 
     typedef rtp_error_t (*packet_handler_vec)(void *, buf_vec&);
+
+    typedef ssize_t (*redirect_sendto_t)(int, const void *, size_t, int);
+    
+    typedef int (*redirect_sendmmsg_t)(int, struct mmsghdr *, unsigned int, int);
 
     struct socket_packet_handler {
         void *arg = nullptr;
@@ -140,6 +140,11 @@ namespace uvgrtp {
              * "arg" is an optional parameter that can be passed to the handler when it's called */
             rtp_error_t install_handler(void *arg, packet_handler_vec handler);
 
+            inline void set_redirect_socket(redirect_sendto_t rd1, redirect_sendmmsg_t rd2) {
+                redirect_sendto = rd1;
+                redirect_sendmmsg = rd2;
+            }
+
         private:
             /* helper function for sending UPD packets, see documentation for sendto() above */
             rtp_error_t __sendto(sockaddr_in& addr, uint8_t *buf, size_t buf_len, int flags, int *bytes_sent);
@@ -159,6 +164,9 @@ namespace uvgrtp {
 
             /* __sendtov() calls these handlers in order before sending the packet */
             std::vector<socket_packet_handler> vec_handlers_;
+
+            redirect_sendto_t redirect_sendto = nullptr;
+            redirect_sendmmsg_t redirect_sendmmsg = nullptr;
 
 #ifndef NDEBUG
             uint64_t sent_packets_ = 0;

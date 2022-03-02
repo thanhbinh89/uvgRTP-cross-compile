@@ -298,6 +298,10 @@ namespace uvgrtp {
              */
             uvgrtp::rtcp *get_rtcp();
 
+            inline uvgrtp::socket *get_socket() {
+                return socket_;
+            }
+
         private:
             /* Initialize the connection by initializing the socket
              * and binding ourselves to specified interface and creating
