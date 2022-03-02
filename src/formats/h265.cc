@@ -116,7 +116,7 @@ rtp_error_t uvgrtp::formats::h265::make_aggregation_pkt()
         if (aggr_pkt_info_.nalus[i].first < UINT16_MAX)
         {
             auto pkt_size = aggr_pkt_info_.nalus[i].first;
-            aggr_pkt_info_.nalus[i].first = htons((u_short)aggr_pkt_info_.nalus[i].first);
+            aggr_pkt_info_.nalus[i].first = htons((unsigned short)aggr_pkt_info_.nalus[i].first);
 
             aggr_pkt_info_.aggr_pkt.push_back(
                 std::make_pair(

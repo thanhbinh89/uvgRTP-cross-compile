@@ -134,7 +134,7 @@ rtp_error_t uvgrtp::formats::h264::make_aggregation_pkt()
         if (nalu.first <= UINT16_MAX)
         {
             auto pkt_size = nalu.first;
-            nalu.first = htons((u_short)nalu.first);
+            nalu.first = htons((unsigned short)nalu.first);
 
             aggr_pkt_info_.aggr_pkt.push_back(std::make_pair(sizeof(uint16_t), (uint8_t*)&nalu.first));
             aggr_pkt_info_.aggr_pkt.push_back(std::make_pair(pkt_size, nalu.second));

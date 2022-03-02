@@ -3,6 +3,10 @@ cmake_minimum_required(VERSION 3.14)
 #
 # Project Configuration
 #
+set(CMAKE_SYSROOT /opt/host/arm-buildroot-linux-musleabihf/sysroot)
+set(CMAKE_C_COMPILER /opt/host/bin/arm-buildroot-linux-musleabihf-gcc)
+set(CMAKE_CXX_COMPILER /opt/host/bin/arm-buildroot-linux-musleabihf-g++)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 

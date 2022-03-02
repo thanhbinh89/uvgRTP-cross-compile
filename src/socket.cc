@@ -519,7 +519,7 @@ rtp_error_t uvgrtp::socket::__recv(uint8_t *buf, size_t buf_len, int flags, int 
 #else
     
     WSABUF DataBuf;
-    DataBuf.len = (u_long)buf_len;
+    DataBuf.len = (unsigned long)buf_len;
     DataBuf.buf = (char *)buf;
     DWORD bytes_received, flags_ = 0;
 
@@ -581,7 +581,7 @@ rtp_error_t uvgrtp::socket::__recvfrom(uint8_t *buf, size_t buf_len, int flags, 
     set_bytes(bytes_read, ret);
 #else
     WSABUF DataBuf;
-    DataBuf.len = (u_long)buf_len;
+    DataBuf.len = (unsigned long)buf_len;
     DataBuf.buf = (char *)buf;
     DWORD bytes_received, flags_ = 0;
 

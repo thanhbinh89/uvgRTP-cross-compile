@@ -212,7 +212,7 @@ rtp_error_t uvgrtp::rtcp::add_participant(std::string dst_addr, uint16_t dst_por
     /* Make the socket non-blocking */
     int enabled = 1;
 
-    if (::ioctlsocket(p->socket->get_raw_socket(), FIONBIO, (u_long *)&enabled) < 0)
+    if (::ioctlsocket(p->socket->get_raw_socket(), FIONBIO, (unsigned long *)&enabled) < 0)
     {
         LOG_ERROR("Failed to make the socket non-blocking!");
     }
@@ -1086,7 +1086,7 @@ rtp_error_t uvgrtp::rtcp::construct_rtcp_header(size_t packet_size,
     frame[1] = frame_type;
 
     // TODO: This should be size in 32-bit words - 1
-    *(uint16_t*)&frame[2] = htons((u_short)packet_size);
+    *(uint16_t*)&frame[2] = htons((unsigned short)packet_size);
 
     if (add_local_ssrc)
     {
@@ -1216,7 +1216,7 @@ rtp_error_t uvgrtp::rtcp::generate_report()
 
         SET_NEXT_FIELD_32(frame, ptr, htonl(ntp_ts >> 32));
         SET_NEXT_FIELD_32(frame, ptr, htonl(ntp_ts & 0xffffffff));
-        SET_NEXT_FIELD_32(frame, ptr, htonl((u_long)rtp_ts));
+        SET_NEXT_FIELD_32(frame, ptr, htonl((unsigned long)rtp_ts));
         SET_NEXT_FIELD_32(frame, ptr, htonl(our_stats.sent_pkts));
         SET_NEXT_FIELD_32(frame, ptr, htonl(our_stats.sent_bytes));
 
@@ -1248,8 +1248,8 @@ rtp_error_t uvgrtp::rtcp::generate_report()
             /* calculate delay of last SR only if SR has been received at least once */
             if (p.second->stats.lsr)
             {
-              uint64_t diff = (u_long)uvgrtp::clock::hrc::diff_now(p.second->stats.sr_ts);
-              SET_NEXT_FIELD_32(frame, ptr, (uint32_t)htonl((u_long)uvgrtp::clock::ms_to_jiffies(diff)));
+              uint64_t diff = (unsigned long)uvgrtp::clock::hrc::diff_now(p.second->stats.sr_ts);
+              SET_NEXT_FIELD_32(frame, ptr, (uint32_t)htonl((unsigned long)uvgrtp::clock::ms_to_jiffies(diff)));
             }
             ptr += p.second->stats.lsr ? 0 : 4;
 
